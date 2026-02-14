@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register</title>
+
+<style>
+body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(120deg,#4facfe,#00f2fe);
+    font-family:Arial;
+}
+
+.navbar {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.navbar .nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.navbar .nav-links a {
+    color: #333;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+.navbar .nav-links a.active {
+    background: #007bff;
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.box{
+    width:430px;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
+}
+h2{text-align:center;}
+label{font-size:13px;margin-top:10px;display:block;}
+input,textarea{
+    width:100%;
+    padding:9px;
+    margin-top:4px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+.gender{display:flex;gap:15px;margin-top:5px;}
+button{
+    width:100%;
+    margin-top:15px;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#007bff;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+}
+#result{
+    display:none;
+    margin-top:20px;
+    background:#f1f2f6;
+    padding:15px;
+    border-left:4px solid #007bff;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">🏠 MyApp</div>
+    <div class="nav-links">
+        <a href="index.html" class="active">📝 Register</a>
+        <a href="login.html">🔐 Login</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="admin.html">🛡️ Admin</a>
+    </div>
+</nav>
+
+<div class="main-content">
+<div class="box">
+<h2>Registration Form</h2>
+
+<form id="registrationForm" onsubmit="register(event)">
+<label>First Name</label>
+<input type="text" id="fname" name="fname" required>
+
+<label>Last Name</label>
+<input type="text" id="lname" name="lname" required>
+
+<label>Email</label>
+<input type="email" id="email" name="email" placeholder="example@amc.in" required>
+
+<label>Password</label>
+<input type="password" id="pwd" name="password" required>
+
+<label>Confirm Password</label>
+<input type="password" id="cpwd" name="confirmPassword" required>
+
+<label>Mobile</label>
+<input type="tel" id="mobile" name="mobile" required>
+
+<label>Gender</label>
+<div class="gender">
+    <input type="radio" name="gender" value="Male" required> Male
+    <input type="radio" name="gender" value="Female" required> Female
+</div>
+
+<label>Date of Birth</label>
+<input type="date" id="dob" name="dob" required>
+
+<label>Address</label>
+<textarea id="address" name="address" rows="2" required></textarea>
+
+<label>
+<input type="checkbox" id="agree" name="agree" required> Accept Terms
+</label>
+
+<button type="submit">Register</button>
+</form>
+
+<div id="result"></div>
+
+<div style="text-align:center;margin-top:15px;">
+    <a href="login.html" style="color:#007bff;text-decoration:none;font-size:14px;">Already have an account? Login here</a>
+</div>
+</div>
+
+<script>
+// ================= VALIDATION FUNCTIONS =================
+
+function fnameValid(n){
+    return /^[A-Z][a-zA-Z. ]{1,14}$/.test(n);
+}
+function lnameValid(n){
+    return /^[A-Z][a-zA-Z]{1,14}$/.test(n);
+}
+function emailValid(e){
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(e);
+}
+function pwdValid(p){
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{7,}$/.test(p);
+}
+function mobileValid(m){
+    return /^[6-9]\d{9}$/.test(m);
+}
+function addressValid(a){
+    return a.length<=15 && /^[a-zA-Z0-9 ,.]+$/.test(a);
+}
+
+// ================= INPUT RESTRICTIONS =================
+
+fname.oninput=()=>fname.value=fname.value.replace(/[^A-Za-z .]/g,'').slice(0,15);
+lname.oninput=()=>lname.value=lname.value.replace(/[^A-Za-z]/g,'').slice(0,15);
+mobile.oninput=()=>{
+    mobile.value=mobile.value.replace(/\D/g,'');
+    if(mobile.value.length===1 && !/[6-9]/.test(mobile.value)) mobile.value='';
+    mobile.value=mobile.value.slice(0,10);
+};
+address.oninput=()=>address.value=address.value.replace(/[^a-zA-Z0-9 ,.]/g,'').slice(0,15);
+
+// ================= SUBMIT =================
+
+async function register(event){
+    event.preventDefault(); // Prevent form submission
+    
+    if(!agree.checked){alert("Accept terms");return;}
+    if(!fnameValid(fname.value)){alert("Invalid First Name");return;}
+    if(!lnameValid(lname.value)){alert("Invalid Last Name");return;}
+    if(!emailValid(email.value)){alert("Invalid Email");return;}
+    if(!pwdValid(pwd.value)){alert("Weak Password");return;}
+    if(pwd.value!==cpwd.value){alert("Password mismatch");return;}
+    if(!mobileValid(mobile.value)){alert("Invalid Mobile");return;}
+    if(!addressValid(address.value)){alert("Invalid Address");return;}
+
+    let g=document.querySelector('input[name="gender"]:checked');
+    if(!g){alert("Select gender");return;}
+
+    // Prepare registration data
+    const registrationData = {
+        fname: fname.value,
+        lname: lname.value,
+        email: email.value,
+        password: pwd.value,
+        cpassword: cpwd.value,
+        mobile: mobile.value,
+        gender: g.value,
+        dob: dob.value,
+        address: address.value,
+        agree: agree.checked
+    };
+
+    try {
+        // Send registration request
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(registrationData)
+        });
+
+        const data = await response.json();
+
+        if(response.ok) {
+            // Log to browser console in proper order
+            console.log("🎉 REGISTRATION SUCCESSFUL!");
+            console.log("=" .repeat(50));
+            console.log("User ID:", data.user_id);
+            console.log("Full Name:", data.data.name);
+            console.log("Email:", data.data.email);
+            console.log("Mobile Number:", data.data.mobile);
+            console.log("Gender:", data.data.gender);
+            console.log("Date of Birth:", data.data.dob);
+            console.log("Address:", data.data.address);
+            console.log("Registration Time:", new Date().toLocaleString());
+            console.log("=" .repeat(50));
+            
+            // Display as organized table in console
+            const orderedData = {
+                "User ID": data.user_id,
+                "Full Name": data.data.name,
+                "Email": data.data.email,
+                "Mobile Number": data.data.mobile,
+                "Gender": data.data.gender,
+                "Date of Birth": data.data.dob,
+                "Address": data.data.address,
+                "Registration Time": new Date().toLocaleString()
+            };
+            console.table(orderedData);
+
+            // Show success message briefly then redirect
+            result.style.display="block";
+            result.style.background="#d4edda";
+            result.style.color="#155724";
+            result.style.border="1px solid #c3e6cb";
+            result.style.padding="15px";
+            result.style.borderRadius="8px";
+            result.innerHTML = `
+<div style="text-align:center;">
+    <h3 style="color:#28a745;margin:0 0 10px 0;">🎉 Registration Successful!</h3>
+    <p style="margin:5px 0;color:#666;">Your account has been created successfully.</p>
+    <p style="margin:10px 0;color:#666;font-size:14px;">Redirecting to login page in 3 seconds...</p>
+    <div style="margin-top:10px;">
+        <div style="width:100%;background:#e9ecef;border-radius:10px;height:6px;">
+            <div id="progressBar" style="width:0%;background:#28a745;height:100%;border-radius:10px;transition:width 0.1s;"></div>
+        </div>
+    </div>
+</div>
+`;
+            
+            // Reset form
+            document.getElementById('registrationForm').reset();
+            
+            // Auto redirect to login page after 3 seconds with progress bar
+            let progress = 0;
+            const progressBar = document.getElementById('progressBar');
+            const interval = setInterval(() => {
+                progress += 3.33; // 100% / 30 steps = 3.33% per step
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    window.location.href = 'login.html';
+                }
+            }, 100); // Update every 100ms for smooth animation
+            
+        } else {
+            console.error("❌ REGISTRATION FAILED:", data.error);
+            alert(data.error);
+        }
+
+    } catch(error) {
+        console.error("❌ NETWORK ERROR:", error);
+        alert("Network error. Please try again.");
+    }
+}
+</script>
+
+</body>
+</html>

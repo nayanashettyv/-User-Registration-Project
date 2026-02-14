@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.navbar {
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar h1 {
+    font-size: 1.5rem;
+}
+
+.navbar .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.navbar .nav-links a.active {
+    background: #dc3545;
+}
+
+.navbar .admin-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.stat-card p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.users-section {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.refresh-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.refresh-btn:hover {
+    background: #218838;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.users-table th,
+.users-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+    background: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+}
+
+.users-table tr:hover {
+    background: #f8f9fa;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.3s;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.no-users {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .users-table {
+        font-size: 0.8rem;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 0.5rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <h1>🛡️ Admin Dashboard</h1>
+    <div class="nav-links">
+        <a href="index.html">📝 Register</a>
+        <a href="login.html">🔐 Login</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="admin.html" class="active">🛡️ Admin</a>
+    </div>
+    <div class="admin-info">
+        <span>Admin Panel</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon">👥</div>
+            <h3 id="totalUsers">0</h3>
+            <p>Total Users</p>
+        </div>
+        <div class="stat-card">
+            <div class="icon">📅</div>
+            <h3 id="todayRegistrations">0</h3>
+            <p>Today's Registrations</p>
+        </div>
+        <div class="stat-card">
+            <div class="icon">🔐</div>
+            <h3>Active</h3>
+            <p>System Status</p>
+        </div>
+        <div class="stat-card">
+            <div class="icon">📊</div>
+            <h3 id="lastUpdate">-</h3>
+            <p>Last Updated</p>
+        </div>
+    </div>
+
+    <div class="users-section">
+        <div class="section-header">
+            <h3>All Registered Users</h3>
+            <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh</button>
+        </div>
+        
+        <div id="loadingUsers" class="loading">
+            <h4>Loading users...</h4>
+        </div>
+
+        <div id="usersContent" style="display: none;">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Address</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="noUsers" class="no-users" style="display: none;">
+            <h4>No users found</h4>
+            <p>No users have registered yet.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load users on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🛡️ Admin Dashboard Loading...');
+    loadUsers();
+});
+
+async function loadUsers() {
+    console.log('📊 Fetching users from server...');
+    document.getElementById('loadingUsers').style.display = 'block';
+    document.getElementById('usersContent').style.display = 'none';
+    document.getElementById('noUsers').style.display = 'none';
+
+    try {
+        const response = await fetch('/users');
+        console.log('📡 Server response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📋 Received data:', data);
+
+        if (data.users && Array.isArray(data.users)) {
+            console.log(`👥 Found ${data.users.length} users`);
+            displayUsers(data.users);
+            updateStats(data.users);
+        } else {
+            console.log('❌ No users array in response');
+            showNoUsers();
+        }
+    } catch (error) {
+        console.error('❌ Error loading users:', error);
+        document.getElementById('loadingUsers').innerHTML = `
+            <h4 style="color: #dc3545;">Error loading users</h4>
+            <p>Please check the console for details and try refreshing.</p>
+            <button onclick="loadUsers()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">
+                🔄 Try Again
+            </button>
+        `;
+    }
+}
+
+function displayUsers(users) {
+    console.log('🖥️ Displaying users in table...');
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+
+    if (users.length === 0) {
+        console.log('📭 No users to display');
+        showNoUsers();
+        return;
+    }
+
+    users.forEach((user, index) => {
+        console.log(`👤 Adding user ${index + 1}:`, user.name);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.id || 'N/A'}</td>
+            <td>${user.name || 'N/A'}</td>
+            <td>${user.email || 'N/A'}</td>
+            <td>${user.mobile || 'N/A'}</td>
+            <td>${user.gender || 'N/A'}</td>
+            <td>${user.dob || 'N/A'}</td>
+            <td>${user.address || 'N/A'}</td>
+            <td>${formatDate(user.created_at)}</td>
+            <td>
+                <button class="delete-btn" onclick="deleteUser(${user.id}, '${user.email}')">
+                    🗑️ Delete
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById('usersContent').style.display = 'block';
+    document.getElementById('loadingUsers').style.display = 'none';
+    
+    console.log('✅ Users table displayed successfully');
+}
+
+function updateStats(users) {
+    console.log('📊 Updating statistics...');
+    
+    // Update total users
+    const totalUsers = users.length;
+    document.getElementById('totalUsers').textContent = totalUsers;
+    console.log(`👥 Total users: ${totalUsers}`);
+    
+    // Calculate today's registrations
+    const today = new Date().toDateString();
+    const todayRegistrations = users.filter(user => {
+        if (!user.created_at) return false;
+        const userDate = new Date(user.created_at).toDateString();
+        return userDate === today;
+    }).length;
+    
+    document.getElementById('todayRegistrations').textContent = todayRegistrations;
+    console.log(`📅 Today's registrations: ${todayRegistrations}`);
+    
+    // Update last update time
+    const updateTime = new Date().toLocaleTimeString();
+    document.getElementById('lastUpdate').textContent = updateTime;
+    console.log(`⏰ Last updated: ${updateTime}`);
+}
+
+function showNoUsers() {
+    console.log('📭 No users found - showing empty state');
+    document.getElementById('noUsers').style.display = 'block';
+    document.getElementById('usersContent').style.display = 'none';
+    document.getElementById('loadingUsers').style.display = 'none';
+    document.getElementById('totalUsers').textContent = '0';
+    document.getElementById('todayRegistrations').textContent = '0';
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+}
+
+async function deleteUser(userId, userEmail) {
+    if (!confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
+        return;
+    }
+
+    try {
+        // Note: You'll need to implement the delete endpoint in your Flask app
+        const response = await fetch(`/users/${userId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('User deleted successfully');
+            loadUsers(); // Refresh the list
+            console.log(`🗑️ Admin deleted user: ${userEmail}`);
+        } else {
+            alert('Error deleting user');
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Error deleting user. Please try again.');
+    }
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout from admin panel?')) {
+        console.log('👋 Admin logged out');
+        window.location.href = 'login.html';
+    }
+}
+</script>
+
+</body>
+</html>
